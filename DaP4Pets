@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DaP 4Pets — Prototipo semplice (2 pagine)</title>
+  <style>
+    :root{
+      --yellow:#EBBC34; /* dal logo */
+      --black:#0B0C10;
+      --gray:#6B7280;
+      --line:#E5E7EB;
+      --bg:#FFFFFF;
+      --card:#FFFFFF;
+      --soft:#F8FAFC;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--black);
+    }
+    .wrap{ max-width: 520px; margin: 0 auto; padding: 18px 16px 28px; }
+
+    /* Header */
+    .top{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 14px; }
+    .brand{ display:flex; align-items:center; gap:10px; min-width: 0; }
+    .logoMark{
+      width:40px; height:40px; border-radius: 12px; background: var(--yellow);
+      display:grid; place-items:center; flex:0 0 auto;
+    }
+    .dots{
+      width:22px; height:22px; display:grid;
+      grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap:4px;
+      transform: translateY(1px);
+    }
+    .dot{ width:100%; height:100%; background: var(--black); border-radius: 999px; }
+    .dot.cut{ position:relative; overflow:hidden; }
+    .dot.cut::after{
+      content:""; position:absolute; width:130%; height:130%;
+      right:-35%; bottom:-35%; background: var(--yellow); transform: rotate(45deg);
+    }
+
+    .title{ display:flex; flex-direction:column; gap:2px; min-width: 0; }
+    .title b{ font-size:16px; line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .title span{ font-size:12px; color: var(--gray); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    .steps{ display:flex; align-items:center; gap:6px; flex:0 0 auto; }
+    .pill{
+      padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+      font-size:12px; color: var(--gray); background:#fff;
+    }
+    .pill.active{ border-color: rgba(11,12,16,.18); color: var(--black); background: rgba(235,188,52,.22); }
+
+    /* Card */
+    .card{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      background: var(--card);
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(11,12,16,.06);
+    }
+    .card h2{ margin:0 0 12px; font-size:14px; }
+
+    label{ display:block; font-size:12px; color: var(--gray); margin:0 0 6px; }
+
+    input, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background:#fff;
+      color: var(--black);
+      outline:none;
+      font-size:14px;
+    }
+    input:focus, select:focus{
+      border-color: rgba(235,188,52,.9);
+      box-shadow: 0 0 0 4px rgba(235,188,52,.25);
+    }
+
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    @media (max-width:420px){ .grid{ grid-template-columns:1fr; } }
+
+    .btnRow{ display:flex; gap:10px; margin-top: 12px; }
+    button{
+      width:100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border:0;
+      cursor:pointer;
+      font-weight:800;
+      font-size:14px;
+    }
+    .primary{ background: var(--black); color:#fff; }
+    .ghost{ background:#fff; color: var(--black); border:1px solid var(--line); font-weight:700; }
+
+    .hint{ margin-top:10px; font-size:12px; color: var(--gray); line-height:1.35; }
+
+    .warn{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius: 14px;
+      background: rgba(239,68,68,.10);
+      border: 1px solid rgba(239,68,68,.25);
+      color:#991B1B;
+      font-size:12px;
+      display:none;
+    }
+
+    /* Switch */
+    .toggleRow{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding: 10px 12px; border:1px solid var(--line); border-radius: 12px;
+      background:#fff;
+    }
+    .toggleRow span{ font-size:14px; font-weight:700; }
+    .switch{
+      position:relative; width:48px; height:28px; background:#F3F4F6;
+      border:1px solid var(--line); border-radius:999px; cursor:pointer; flex:0 0 auto;
+    }
+    .switch::after{
+      content:""; position:absolute; top:3px; left:3px; width:22px; height:22px;
+      border-radius:999px; background:#fff; border:1px solid rgba(11,12,16,.10);
+      transition: all .18s ease; box-shadow: 0 6px 14px rgba(11,12,16,.12);
+    }
+    .switch.on{ background: rgba(235,188,52,.35); border-color: rgba(235,188,52,.7); }
+    .switch.on::after{ left:23px; }
+
+    /* Segmented */
+    .seg{
+      display:grid; grid-template-columns: 1fr 1fr;
+      gap:8px; margin-top: 6px;
+    }
+    .seg3{ grid-template-columns: 1fr 1fr 1fr; }
+    .seg button{
+      padding:10px 10px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-weight:800;
+      font-size:13px;
+      color:var(--black);
+    }
+    .seg button.active{
+      background: rgba(235,188,52,.22);
+      border-color: rgba(11,12,16,.18);
+    }
+
+    /* Advanced */
+    details{
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--soft);
+      overflow:hidden;
+    }
+    summary{
+      list-style:none;
+      cursor:pointer;
+      padding: 12px 12px;
+      font-weight:900;
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    .advBody{ padding: 12px; border-top:1px solid var(--line); background:#fff; }
+
+    /* Section headers inside page 1 */
+    .sectionTitle{
+      margin: 0 0 10px;
+      font-size:13px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .sectionTitle .badge{
+      width:8px; height:8px; border-radius:999px; background: var(--yellow);
+      box-shadow: 0 6px 18px rgba(235,188,52,.35);
+    }
+    .sectionCard{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background:#fff;
+    }
+
+    /* Results */
+    .bigNumber{ font-size:40px; font-weight:900; letter-spacing:-.8px; margin: 6px 0 2px; }
+    .subLine{ font-size:13px; color: var(--gray); margin:0; }
+    .resultBox{ margin-top: 10px; display:grid; gap:10px; }
+    .miniCard{ border:1px solid var(--line); border-radius: 14px; padding:12px; background:#fff; }
+    .miniTop{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+    .miniTop b{ font-size:14px; }
+    .miniTop span{ font-size:12px; color:var(--gray); }
+    .miniVal{ margin-top:6px; font-size:22px; font-weight:900; }
+    .tagRow{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .tag{
+      font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--line);
+      background: rgba(235,188,52,.18); color: var(--black); font-weight:800;
+    }
+
+    .page{ display:none; }
+    .page.active{ display:block; }
+    .foot{ margin-top: 12px; font-size:11px; color: var(--gray); }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+
+    /* Share canvas */
+    #shareCanvas{ display:none; }
+
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logoMark" aria-hidden="true">
+          <div class="dots">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot cut"></div>
+          </div>
+        </div>
+        <div class="title">
+          <b>DaP 4Pets</b>
+          <span>kcal + grammi cibo (super semplice)</span>
+        </div>
+      </div>
+      <div class="steps">
+        <div id="step1" class="pill active">1 · Dati</div>
+        <div id="step2" class="pill">2 · Risultati</div>
+      </div>
+    </div>
+
+    <!-- PAGE 1 -->
+    <section id="pageInput" class="page active">
+      <div class="card">
+        <h2>Inserisci i dati</h2>
+
+        <!-- Gerarchia migliorata: Cane -> Attività -> Alimentazione -->
+        <div class="sectionTitle"><span class="badge"></span> Cane</div>
+        <div class="sectionCard">
+          <div class="grid">
+            <div>
+              <label for="peso">Peso cane (kg) *</label>
+              <input id="peso" type="number" inputmode="decimal" min="0.5" step="0.1" placeholder="es. 10.0">
+            </div>
+            <div>
+              <label>Sterilizzato</label>
+              <div class="toggleRow">
+                <span id="sterText">Sì</span>
+                <div id="sterSwitch" class="switch on" role="switch" aria-checked="true" tabindex="0"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div class="sectionTitle"><span class="badge"></span> Attività</div>
+        <div class="sectionCard">
+          <div class="grid">
+            <div>
+              <label for="steps">Passi *</label>
+              <input id="steps" type="number" inputmode="numeric" min="0" step="1" placeholder="es. 8000">
+            </div>
+            <div>
+              <label>Passi: modalità *</label>
+              <div class="seg">
+                <button type="button" id="modeAvg" class="active">Media</button>
+                <button type="button" id="modeDay">Oggi</button>
+              </div>
+              <div class="hint" style="margin-top:6px;">
+                “Media” = media giornaliera. “Oggi” = passi del giorno (specifico).
+              </div>
+            </div>
+          </div>
+
+          <div id="dayBox" style="margin-top:10px; display:none;">
+            <div class="grid">
+              <div>
+                <label for="dayDate">Data</label>
+                <input id="dayDate" type="date">
+              </div>
+              <div>
+                <label for="dayNote">Nota (opz.)</label>
+                <input id="dayNote" type="text" placeholder="es. riposo / corsa / pioggia">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div class="sectionTitle"><span class="badge"></span> Alimentazione</div>
+        <div class="sectionCard">
+          <div class="grid">
+            <div>
+              <label>Tipo alimento *</label>
+              <div class="seg seg3">
+                <button type="button" id="foodDry" class="active">Crocchette</button>
+                <button type="button" id="foodWet">Umido</button>
+                <button type="button" id="foodMix">Misto</button>
+              </div>
+            </div>
+
+            <div>
+              <label for="kcal100A">kcal/100g (alimento) *</label>
+              <input id="kcal100A" type="number" inputmode="decimal" min="20" step="1" value="360">
+              <div class="hint" style="margin-top:6px;">Leggi l’etichetta.</div>
+            </div>
+          </div>
+
+          <!-- Se MISTO -->
+          <div id="mixBox" style="margin-top:10px; display:none;">
+            <div class="grid">
+              <div>
+                <label for="kcal100Dry">Crocchette kcal/100g</label>
+                <input id="kcal100Dry" type="number" inputmode="decimal" min="20" step="1" value="360">
+              </div>
+              <div>
+                <label for="kcal100Wet">Umido kcal/100g</label>
+                <input id="kcal100Wet" type="number" inputmode="decimal" min="10" step="1" value="120">
+              </div>
+              <div>
+                <label for="mixPctDry">% kcal da crocchette</label>
+                <input id="mixPctDry" type="number" inputmode="decimal" min="0" max="100" step="1" value="50">
+              </div>
+              <div>
+                <label for="mixPctWet">% kcal da umido</label>
+                <input id="mixPctWet" type="number" inputmode="decimal" min="0" max="100" step="1" value="50">
+              </div>
+            </div>
+            <div class="hint">Nel misto la ripartizione è in <b>% delle kcal</b> (crocchette + umido = 100).</div>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <details>
+          <summary>
+            Impostazioni avanzate (opzionali)
+            <span class="mono">▼</span>
+          </summary>
+          <div class="advBody">
+            <div class="grid">
+              <div>
+                <label for="fase">Età / fase</label>
+                <select id="fase">
+                  <option value="adulto" selected>Adulto</option>
+                  <option value="cucciolo_0_4">Cucciolo 0–4 mesi</option>
+                  <option value="cucciolo_4_12">Cucciolo 4–12 mesi</option>
+                  <option value="senior">Senior</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="obiettivo">Obiettivo</label>
+                <select id="obiettivo">
+                  <option value="mantenimento" selected>Mantenimento</option>
+                  <option value="dimagrimento">Dimagrimento</option>
+                  <option value="aumento">Aumento peso</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="pasti">Pasti al giorno</label>
+                <select id="pasti">
+                  <option value="2" selected>2 pasti</option>
+                  <option value="3">3 pasti</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="passiPerKm">Conversione passi → km (passi per 1 km)</label>
+                <input id="passiPerKm" type="number" inputmode="numeric" min="200" step="50" value="1400">
+              </div>
+
+              <div>
+                <label for="intensita">Intensità attività</label>
+                <select id="intensita">
+                  <option value="0.8">Tranquilla</option>
+                  <option value="1.0" selected>Sostenuta</option>
+                  <option value="1.3">Corsa / salite</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="pesoIdeale">Peso target (opz.)</label>
+                <input id="pesoIdeale" type="number" inputmode="decimal" min="0.5" step="0.1" placeholder="es. 9.0">
+              </div>
+
+              <div>
+                <label for="saveDay">Salva questa giornata nel diario</label>
+                <select id="saveDay">
+                  <option value="no" selected>No</option>
+                  <option value="si">Sì</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="dogName">Nome cane (per immagine social)</label>
+                <input id="dogName" type="text" placeholder="es. Nacio">
+              </div>
+            </div>
+
+            <div class="hint">
+              <b>Passi per km</b>: modifica in base al tuo tracker. Default 1400 (placeholder).
+            </div>
+          </div>
+        </details>
+
+        <div id="warn" class="warn"></div>
+
+        <div class="btnRow">
+          <button id="btnCalc" class="primary">Vai ai risultati</button>
+        </div>
+
+        <div class="hint">
+          Obbligatori: <b>peso</b>, <b>passi</b>, <b>kcal/100g</b> e <b>tipo alimento</b>.
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 2 -->
+    <section id="pageResult" class="page">
+      <div class="card">
+        <h2>Risultati</h2>
+
+        <div class="bigNumber" id="outKcal">—</div>
+        <p class="subLine" id="outRange">—</p>
+
+        <div class="resultBox">
+          <div class="miniCard">
+            <div class="miniTop">
+              <b>Quantità cibo (giorno)</b>
+              <span id="outFoodRate">—</span>
+            </div>
+            <div class="miniVal" id="outFood">—</div>
+            <div class="hint" style="margin:8px 0 0;">
+              Per pasto: <b><span id="outMeal">—</span></b>
+            </div>
+          </div>
+
+          <div id="mixResult" class="miniCard" style="display:none;">
+            <div class="miniTop">
+              <b>Misto (grammi separati)</b>
+              <span id="mixSplit">—</span>
+            </div>
+            <div class="miniVal" id="mixGrams">—</div>
+            <div class="hint" style="margin:8px 0 0;">
+              Per pasto: <b><span id="mixMeal">—</span></b>
+            </div>
+          </div>
+
+          <div class="miniCard">
+            <div class="miniTop">
+              <b>Riepilogo</b>
+              <span>input usati</span>
+            </div>
+            <div class="tagRow" id="tags"></div>
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <button id="btnBack" class="ghost">Modifica dati</button>
+          <button id="btnShare" class="primary">Condividi risultato</button>
+        </div>
+
+        <div class="foot">
+          Nota: stima indicativa. Se dopo 10–14 giorni il peso sale/scende troppo, regola del 5–10%.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Canvas per immagine social -->
+  <canvas id="shareCanvas" width="1080" height="1080"></canvas>
+
+  <script>
+    // ===== Helpers
+    const $ = (id)=>document.getElementById(id);
+    const warnBox = $("warn");
+    function showWarn(msg){ warnBox.textContent = msg; warnBox.style.display = "block"; }
+    function hideWarn(){ warnBox.textContent = ""; warnBox.style.display = "none"; }
+
+    function goTo(page){
+      $("pageInput").classList.toggle("active", page === "input");
+      $("pageResult").classList.toggle("active", page === "result");
+      $("step1").classList.toggle("active", page === "input");
+      $("step2").classList.toggle("active", page === "result");
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    // ===== Switch sterilizzato
+    let sterilizzato = true;
+    function syncSterUI(){
+      $("sterSwitch").classList.toggle("on", sterilizzato);
+      $("sterSwitch").setAttribute("aria-checked", sterilizzato ? "true" : "false");
+      $("sterText").textContent = sterilizzato ? "Sì" : "No";
+    }
+    function toggleSter(){ sterilizzato = !sterilizzato; syncSterUI(); }
+    $("sterSwitch").addEventListener("click", toggleSter);
+    $("sterSwitch").addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleSter(); }});
+    syncSterUI();
+
+    // ===== Modalità passi
+    let stepsMode = "avg"; // avg | day
+    function setStepsMode(mode){
+      stepsMode = mode;
+      $("modeAvg").classList.toggle("active", mode==="avg");
+      $("modeDay").classList.toggle("active", mode==="day");
+      $("dayBox").style.display = (mode==="day") ? "block" : "none";
+    }
+    $("modeAvg").addEventListener("click", ()=>setStepsMode("avg"));
+    $("modeDay").addEventListener("click", ()=>setStepsMode("day"));
+    setStepsMode("avg");
+
+    // ===== Tipo alimento
+    let foodType = "dry"; // dry | wet | mix
+    function setFoodType(t){
+      foodType = t;
+      $("foodDry").classList.toggle("active", t==="dry");
+      $("foodWet").classList.toggle("active", t==="wet");
+      $("foodMix").classList.toggle("active", t==="mix");
+      $("mixBox").style.display = (t==="mix") ? "block" : "none";
+
+      if(t==="dry") $("kcal100A").value = $("kcal100Dry").value || $("kcal100A").value;
+      if(t==="wet") $("kcal100A").value = $("kcal100Wet").value || $("kcal100A").value;
+    }
+    $("foodDry").addEventListener("click", ()=>setFoodType("dry"));
+    $("foodWet").addEventListener("click", ()=>setFoodType("wet"));
+    $("foodMix").addEventListener("click", ()=>setFoodType("mix"));
+    setFoodType("dry");
+
+    $("kcal100Dry").addEventListener("input", ()=>{ if(foodType==="dry") $("kcal100A").value = $("kcal100Dry").value; });
+    $("kcal100Wet").addEventListener("input", ()=>{ if(foodType==="wet") $("kcal100A").value = $("kcal100Wet").value; });
+
+    // ===== Calcolo
+    function calcRER(kg){ return 70 * Math.pow(kg, 0.75); }
+    function baseFactor(fase, sterilizzato){
+      if (fase === "cucciolo_0_4") return 3.0;
+      if (fase === "cucciolo_4_12") return 2.0;
+      if (fase === "senior") return 1.3;
+      return sterilizzato ? 1.4 : 1.6;
+    }
+    function goalFactor(goal){
+      if(goal === "dimagrimento") return 0.85;
+      if(goal === "aumento") return 1.10;
+      return 1.00;
+    }
+
+    // Diario semplice (solo se scegli "salva giornata")
+    const LOG_KEY = "dap4pets_steps_log_v1";
+    function loadLog(){ try{ return JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); }catch(e){ return []; } }
+    function saveLog(arr){ localStorage.setItem(LOG_KEY, JSON.stringify(arr)); }
+
+    let last = null;
+
+    function compute(){
+      hideWarn();
+
+      const peso = parseFloat($("peso").value);
+      const steps = parseFloat($("steps").value);
+      const passiPerKm = parseFloat($("passiPerKm").value || "1400");
+      const kcal100A = parseFloat($("kcal100A").value);
+      const fase = $("fase").value;
+      const obiettivo = $("obiettivo").value;
+      const intensita = parseFloat($("intensita").value);
+      const pasti = parseInt($("pasti").value || "2", 10);
+      const pesoIdeale = parseFloat($("pesoIdeale").value);
+
+      if(!peso || peso<=0) return showWarn("Inserisci un peso valido (kg).");
+      if(!steps && steps!==0) return showWarn("Inserisci i passi.");
+      if(steps < 0) return showWarn("I passi non possono essere negativi.");
+
+      if(!passiPerKm || passiPerKm<=0) return showWarn("Controlla 'passi per km' nelle impostazioni avanzate.");
+
+      if(foodType!=="mix"){
+        if(!kcal100A || kcal100A<=0) return showWarn("Inserisci kcal/100g valide (etichetta).");
+      } else {
+        const kcal100Dry = parseFloat($("kcal100Dry").value);
+        const kcal100Wet = parseFloat($("kcal100Wet").value);
+        const pctDry = parseFloat($("mixPctDry").value);
+        const pctWet = parseFloat($("mixPctWet").value);
+
+        if(!kcal100Dry || kcal100Dry<=0) return showWarn("Nel misto: inserisci kcal/100g delle crocchette.");
+        if(!kcal100Wet || kcal100Wet<=0) return showWarn("Nel misto: inserisci kcal/100g dell’umido.");
+        if(pctDry + pctWet !== 100) return showWarn("Nel misto: le % kcal devono sommare 100.");
+      }
+
+      // peso di calcolo (se target sensato)
+      let pesoCalc = peso;
+      if(!Number.isNaN(pesoIdeale) && pesoIdeale > 0){
+        if(pesoIdeale < 0.4 * peso || pesoIdeale > 1.2 * peso){
+          return showWarn("Peso target fuori range. Correggilo o lascialo vuoto.");
+        }
+        pesoCalc = pesoIdeale;
+      }
+
+      // Converti passi -> km stimati
+      const km = steps / passiPerKm;
+
+      const RER = calcRER(pesoCalc);
+      const Fbase = baseFactor(fase, sterilizzato);
+      const kcalBase = RER * Fbase;
+
+      // extra attività basata su km stimati
+      const kcalKm = pesoCalc * km * intensita;
+
+      const kcalMaint = kcalBase + kcalKm;
+      const kcalTarget = kcalMaint * goalFactor(obiettivo);
+
+      const rLow = kcalTarget * 0.95;
+      const rHigh = kcalTarget * 1.05;
+
+      // grammi alimento
+      let gramsPerDay = null;
+      let mix = null;
+
+      if(foodType === "dry" || foodType === "wet"){
+        const kcalPerGram = kcal100A / 100;
+        gramsPerDay = kcalTarget / kcalPerGram;
+      } else {
+        const kcal100Dry = parseFloat($("kcal100Dry").value);
+        const kcal100Wet = parseFloat($("kcal100Wet").value);
+        const pctDry = parseFloat($("mixPctDry").value);
+        const pctWet = parseFloat($("mixPctWet").value);
+
+        const kcalDry = kcalTarget * (pctDry/100);
+        const kcalWet = kcalTarget * (pctWet/100);
+
+        const gDry = kcalDry / (kcal100Dry/100);
+        const gWet = kcalWet / (kcal100Wet/100);
+
+        mix = { kcal100Dry, kcal100Wet, pctDry, pctWet, gDry, gWet };
+      }
+
+      // Diario (se richiesto)
+      const saveDayFlag = $("saveDay").value === "si";
+      const dayDate = $("dayDate").value;
+      const dayNote = ($("dayNote").value || "").trim();
+
+      if(saveDayFlag){
+        const log = loadLog();
+        log.push({
+          date: dayDate || new Date().toISOString().slice(0,10),
+          mode: stepsMode,
+          steps,
+          km: Math.round(km*100)/100,
+          weight: Math.round(peso*10)/10,
+          note: dayNote
+        });
+        log.sort((a,b)=> (a.date||"").localeCompare(b.date||""));
+        saveLog(log);
+      }
+
+      return {
+        peso, pesoCalc,
+        stepsMode,
+        steps,
+        passiPerKm,
+        km,
+        fase, obiettivo, intensita,
+        sterilizzato,
+        pasti,
+        kcalTarget, rLow, rHigh,
+        foodType,
+        kcal100A,
+        gramsPerDay,
+        mix
+      };
+    }
+
+    function render(res){
+      last = res;
+      $("outKcal").textContent = Math.round(res.kcalTarget) + " kcal/die";
+      $("outRange").textContent = "Range pratico: " + Math.round(res.rLow) + "–" + Math.round(res.rHigh) + " kcal";
+
+      const tags = [];
+      tags.push(`Peso: ${res.pesoCalc.toFixed(1)} kg`);
+      tags.push(`Passi: ${Math.round(res.steps)} (${res.stepsMode==="avg" ? "media" : "giorno"})`);
+      tags.push(`Km stimati: ${res.km.toFixed(2)} (/${Math.round(res.passiPerKm)} passi/km)`);
+      tags.push(`Intensità: ${res.intensita}`);
+      tags.push(`Sterilizzato: ${res.sterilizzato ? "sì" : "no"}`);
+      tags.push(`Fase: ${res.fase}`);
+      tags.push(`Obiettivo: ${res.obiettivo}`);
+      tags.push(`Pasti: ${res.pasti}`);
+
+      const wrap = $("tags");
+      wrap.innerHTML = "";
+      tags.forEach(t=>{
+        const el = document.createElement("div");
+        el.className = "tag";
+        el.textContent = t;
+        wrap.appendChild(el);
+      });
+
+      $("mixResult").style.display = "none";
+
+      if(res.foodType === "dry" || res.foodType === "wet"){
+        const label = (res.foodType === "dry") ? "Crocchette" : "Umido";
+        $("outFoodRate").textContent = `${label} · ${res.kcal100A} kcal/100g`;
+        const gDay = Math.round(res.gramsPerDay);
+        $("outFood").textContent = `${gDay} g / giorno`;
+        $("outMeal").textContent = `${Math.round(gDay / res.pasti)} g per pasto`;
+      } else {
+        $("outFoodRate").textContent = `Misto · kcal ripartite`;
+        $("outFood").textContent = `— (vedi sotto)`;
+        $("outMeal").textContent = `—`;
+
+        const gDry = Math.round(res.mix.gDry);
+        const gWet = Math.round(res.mix.gWet);
+
+        $("mixResult").style.display = "block";
+        $("mixSplit").textContent = `${res.mix.pctDry}% crocchette / ${res.mix.pctWet}% umido`;
+        $("mixGrams").textContent = `Crocchette: ${gDry} g · Umido: ${gWet} g`;
+        $("mixMeal").textContent = `Crocchette: ${Math.round(gDry / res.pasti)} g + Umido: ${Math.round(gWet / res.pasti)} g`;
+      }
+    }
+
+    // ===== Share image (stile "stupendo" dell'ultimo codice, integrato qui)
+    function drawShareImage(){
+      const c = $("shareCanvas");
+      const ctx = c.getContext("2d");
+      const W = c.width, H = c.height;
+
+      // background
+      ctx.fillStyle = "#EBBC34";
+      ctx.fillRect(0,0,W,H);
+
+      // text color
+      ctx.fillStyle = "#000";
+
+      // title
+      ctx.font = "900 76px system-ui";
+      ctx.fillText("DaP 4Pets", 80, 150);
+
+      // dog name optional
+      const dogName = ($("dogName").value || "").trim();
+      if(dogName){
+        ctx.font = "800 44px system-ui";
+        ctx.fillText("🐶 " + dogName, 80, 220);
+      }
+
+      // kcal
+      ctx.font = "900 120px system-ui";
+      ctx.fillText(Math.round(last.kcalTarget) + " kcal", 80, 410);
+
+      // food
+      ctx.font = "900 60px system-ui";
+      let line1 = "";
+      let line2 = "";
+
+      if(last.foodType === "dry" || last.foodType === "wet"){
+        const label = last.foodType === "dry" ? "Crocchette" : "Umido";
+        const gDay = Math.round(last.gramsPerDay);
+        const gMeal = Math.round(gDay / last.pasti);
+        line1 = `${label}: ${gDay} g / giorno`;
+        line2 = `${gMeal} g per pasto (${last.pasti} pasti)`;
+      } else {
+        const gDry = Math.round(last.mix.gDry);
+        const gWet = Math.round(last.mix.gWet);
+        line1 = `Misto: Crocchette ${gDry} g + Umido ${gWet} g`;
+        line2 = `(${last.mix.pctDry}% / ${last.mix.pctWet}%) • ${last.pasti} pasti`;
+      }
+      ctx.fillText(line1, 80, 560);
+      ctx.font = "800 54px system-ui";
+      ctx.fillText(line2, 80, 630);
+
+      // meta
+      ctx.font = "700 40px system-ui";
+      ctx.fillText(`Peso: ${last.pesoCalc.toFixed(1)} kg`, 80, 820);
+      ctx.fillText(`Passi: ${Math.round(last.steps)} • Km stimati: ${last.km.toFixed(2)}`, 80, 880);
+
+      // small footer
+      ctx.font = "600 30px system-ui";
+      ctx.fillText("Stima indicativa • regola 5–10% dopo 10–14 giorni se serve", 80, 1010);
+
+      // branding stripe
+      ctx.fillStyle = "rgba(0,0,0,.20)";
+      ctx.fillRect(80, 1040, W-160, 10);
+    }
+
+    function shareDownload(){
+      if(!last) return;
+      drawShareImage();
+      const c = $("shareCanvas");
+      const a = document.createElement("a");
+      a.download = "dap4pets_risultato.png";
+      a.href = c.toDataURL("image/png");
+      a.click();
+    }
+
+    // ===== Actions
+    $("btnCalc").addEventListener("click", ()=>{
+      const res = compute();
+      if(!res || res instanceof HTMLElement) return;
+      render(res);
+      goTo("result");
+    });
+
+    $("btnBack").addEventListener("click", ()=> goTo("input"));
+
+    $("btnShare").addEventListener("click", ()=>{
+      if(!last) return;
+      shareDownload();
+    });
+
+    // UX: Enter = calcola
+    document.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter" && $("pageInput").classList.contains("active")){
+        e.preventDefault();
+        $("btnCalc").click();
+      }
+    });
+
+    // Defaults
+    (function init(){
+      const iso = new Date().toISOString().slice(0,10);
+      $("dayDate").value = iso;
+    })();
+  </script>
+</body>
+</html>
